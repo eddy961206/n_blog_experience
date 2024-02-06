@@ -11,7 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import (NoSuchElementException, TimeoutException,
                                         ElementClickInterceptedException, UnexpectedAlertPresentException,
                                         NoAlertPresentException)
-from program_actions import find_element_with_retry, scroll_to_top
+from program_actions import find_element_with_retry
 from bs4 import BeautifulSoup
 
 

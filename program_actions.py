@@ -92,6 +92,6 @@ def capture_screenshot(driver, error_message):
     
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')  # 현재 시간으로 타임스탬프 생성
     screenshot_file = os.path.join(screenshots_dir, f"error_{timestamp}.png")
-    driver.save_screenshot(screenshot_file)  # 스크린샷 저장
+    driver.save_screenshot(screenshot_file)  # 스크린샷 저장s
     print(f"\n에러 스크린샷이 {screenshots_dir} 폴더에 저장되었습니다.")
     print(f"에러 메시지: {error_message}")
