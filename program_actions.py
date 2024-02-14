@@ -1,8 +1,6 @@
-
-import datetime
-import os
-import pickle
-import time
+from user_agents import parse
+import datetime, os, pickle, random, time
+import undetected_chromedriver as uc
 from openpyxl import Workbook
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -11,47 +9,41 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from datetime import datetime
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
+from mutil import random_move
 
-
-
-def get_system_user_agent():
-    """시스템의 현재 user-agent를 가져옵니다."""
-    temp_driver = webdriver.Chrome()
-    temp_driver.get("about:blank")
-    user_agent = temp_driver.execute_script("return navigator.userAgent;")
-    temp_driver.quit()
-    return user_agent
-
-
-def initialize_driver():
-    """user-agent를 사용하여 크롬 드라이버 초기화"""
-    user_agent = get_system_user_agent()
-    options = Options()
-    options.add_argument(f"user-agent={user_agent}")
-
-    driver = webdriver.Chrome(options=options)
-    driver.implicitly_wait(5)
-    return driver
-
-   
-
-def scroll_to_top(driver):
-    """브라우저 스크롤을 맨 위로 이동하고 새로운 컨텐츠 로드될 때까지 반복"""
+def scroll_to_top(driver, isMobile=True):
+    """브라우저 스크롤을 자연스럽게 맨 위로 이동"""
     while True:
         # 현재 스크롤 위치 저장
         current_scroll_position = driver.execute_script("return window.pageYOffset;")
         
-        # 스크롤을 맨 위로 이동
-        driver.execute_script("window.scrollTo(0, 0);")
-        time.sleep(0.5)  # 짧은 대기 시간
+        if current_scroll_position <= 0:
+            break  # 이미 최상단에 도달한 경우 루프 중단
 
-        # 새로운 스크롤 위치 확인
+        random_move(driver, direction="up", count=1, isMobile=True)
+
         new_scroll_position = driver.execute_script("return window.pageYOffset;")
 
-        # 스크롤 위치가 변하지 않았다면 중단
         if current_scroll_position == new_scroll_position:
-            break        
+            break   
 
+def element_random_click(driver,element):
+    el_width, el_height = element.size['width'], element.size['height']
+    targetX = random.randint( -int(el_width * 0.4), int(el_width*0.4) )
+    targetY = random.randint( -int(el_height *0.4), int(el_height*0.4))
+
+    ActionChains(driver).move_to_element(element).pause(2).move_by_offset(targetX,targetY).click().perform()
+
+def random_click(driver, css_selector):
+    element = driver.find_element(By.CSS_SELECTOR, css_selector)
+    el_width, el_height = element.size['width'], element.size['height']
+    targetX = random.randint(-int(el_width(*0.40), int(el_width*0.40)))
+    targetY = random.randint(-int(el_height(*0.40), int(el_height*0.40)))
+    
+    ActionChains(driver).move_to_element(element)\
+        .pause(1).move_by_offset(targetX, targetY).clcik().perform()
 
 
 def find_element_with_retry(driver, by, value, delay=5):
@@ -124,3 +116,4 @@ def save_cookies(driver):
     current_domain = driver.current_url
     with open('cookies.pkl', 'wb') as file:
         pickle.dump((cookies, current_domain), file)
+
